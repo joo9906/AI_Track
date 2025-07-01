@@ -1,7 +1,2 @@
 .env
-allergies.csv
-conditions.csv
-filter_obervation.csv
-medications.csv
-patients.csv
-procedures.csv
+*.csv
