@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from chat import chat
+from .chat import chat
 from retriever import retriever
 
 app = FastAPI()
