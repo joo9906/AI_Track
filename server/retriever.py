@@ -9,7 +9,7 @@ api_key = os.getenv("UPSTAGE_API_KEY")
 
 # 2. 임베딩 모델 생성 (API 키 전달)
 embedding = UpstageEmbeddings(
-    model="solar-embedding-1-large",
+    model="embedding-query",
     api_key=api_key
 )
 
@@ -22,7 +22,7 @@ vectorstore = Chroma(
     embedding_function=embedding
 )
 
-def retriever(query, k=3):
+def retriever(query, k=5):
     retriever = vectorstore.as_retriever(
         search_type='mmr',
         search_kwargs={"k": k}
