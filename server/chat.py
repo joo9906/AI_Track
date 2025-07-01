@@ -1,8 +1,17 @@
+from dotenv import load_dotenv
+import os
 from langchain_upstage import ChatUpstage
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 
-llm = ChatUpstage()
+# .env 파일에서 환경변수 불러오기
+load_dotenv()
+
+# 환경변수에서 API 키 읽기
+api_key = os.getenv("UPSTAGE_API_KEY")
+
+# ChatUpstage에 API 키 전달
+llm = ChatUpstage(api_key=api_key)
 
 prompt = ChatPromptTemplate.from_messages(
     [
