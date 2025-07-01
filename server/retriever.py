@@ -29,3 +29,18 @@ def retriever(query, k=3):
     )
     result_docs = retriever.invoke(query)
     return result_docs
+
+
+if __name__ == "__main__":
+    query = input("검색할 쿼리를 입력하세요: ")
+    results = retriever(query)
+    print("\n[검색 결과]")
+    for i, doc in enumerate(results, 1):
+        print(f"\n--- 문서 {i} ---")
+        # doc이 dict 또는 Document 객체일 수 있으니, 적절히 출력
+        if hasattr(doc, 'page_content'):
+            print(doc.page_content)
+        elif isinstance(doc, dict) and 'page_content' in doc:
+            print(doc['page_content'])
+        else:
+            print(doc)

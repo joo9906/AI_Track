@@ -35,3 +35,15 @@ def chat(query, doc):
     chain = prompt | llm | StrOutputParser()
     response = chain.invoke({"context": doc, "input": query})
     return response
+
+
+if __name__ == "__main__":
+    print("테스트용 쿼리와 문맥(context)을 입력하세요.\n")
+    query = input("질문을 입력하세요: ")
+    print("\n문맥(context)을 입력하세요. (여러 줄 입력 후 Ctrl+D 또는 Ctrl+Z로 종료)\n")
+    # 여러 줄 입력 받기
+    import sys
+    context = sys.stdin.read().strip()
+    print("\n[답변]")
+    answer = chat(query, context)
+    print(answer)
