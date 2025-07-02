@@ -60,7 +60,7 @@
     <!-- 환자 요약 + 채팅 영역 -->
     <div v-else class="flex flex-row w-full max-w-6xl bg-white opacity-90 rounded-lg shadow-lg p-6 h-[900px] gap-[100px]">
       <!-- 환자 요약 카드 -->
-      <div class="w-80 flex-shrink-0">
+      <div class="w-80 flex-shrink-0" style="margin-top: 10%; margin-right: 5%;">
         <div class="p-4 rounded-lg bg-white border border-gray-300 text-gray-900 text-sm shadow-md w-full">
           <div class="font-bold text-lg mb-3 border-b pb-2">환자 요약 정보</div>
           <table class="w-full text-sm border-separate border-spacing-y-1">
@@ -79,7 +79,7 @@
           </table>
         </div>
       </div>
-
+      <div><p></p></div>
       <!-- 채팅창 -->
       <div class="flex-1 flex flex-col min-h-0 ml-4">
         <div
@@ -128,19 +128,14 @@ const chatContainer = ref(null)
 
 function makeLLMPrompt(patient) {
   return `
-당신은 의료 전문가의 약물 투약 의사결정을 돕는 AI입니다.
-아래 CONTEXT 정보를 참고하세요.
-
-[CONTEXT]
+[New_Patient]
 1. 환자 기본 정보: 나이 ${patient.age ?? ''}세, 성별 ${patient.gender ?? ''}, 체중 ${patient.weight ?? ''}kg, 흡연 여부: ${patient.smoke ?? ''}
 2. 진단 질병 정보: ${patient.comorbidity || '없음'}
 3. 약물 투여 기록: ${patient.drug || '없음'}
 4. 알러지 반응 기록: ${patient.allergies || '없음'}
 5. 바이탈/검사 수치: 최고혈압 ${patient.sbp ?? ''}, 최저혈압 ${patient.dbp ?? ''}
 6. 수술/시술 이력: ${patient.procedures || '없음'}
-
 전문 의료진들이 사용하는 언어로 답변해주세요.
-모르면 모른다고 하세요.
 `.trim()
 }
 
@@ -170,23 +165,29 @@ async function sendMessage() {
 
   const userMessage = input.value.trim()
   input.value = ''
-
-  // 프론트 히스토리 누적
   messages.value.push({ role: 'user', content: userMessage })
 
   await nextTick(() => {
     if (chatContainer.value) chatContainer.value.scrollTop = chatContainer.value.scrollHeight
   })
 
-  // system prompt를 미리 꺼내기
   let systemPrompt = messages.value.find(m => m.role === 'system')?.content
-  if (!systemPrompt) {
+  let messageToSend = ''
+
+  if (systemPrompt) {
+    const hasSentSystem = messages.value.some(m => m.role === 'assistant')
+    if (hasSentSystem) {
+      messageToSend = `user: ${userMessage}`
+    } else {
+      // system prompt는 있지만 서버에 아직 안 보냈으면 포함
+      messageToSend = `system: ${systemPrompt}\nuser: ${userMessage}`
+    }
+  } else {
+    // 안전장치 - 시스템 메시지 자체가 없을 경우
     systemPrompt = makeLLMPrompt(patient.value)
     messages.value.unshift({ role: 'system', content: systemPrompt })
+    messageToSend = `system: ${systemPrompt}\nuser: ${userMessage}`
   }
-
-  // 서버에 보낼 메시지: system + 마지막 user만 포함
-  const messageToSend = `system: ${systemPrompt}\nuser: ${userMessage}`
 
   try {
     const res = await fetch(`${import.meta.env.VITE_SERVER_API}/chat`, {
@@ -210,7 +211,9 @@ async function sendMessage() {
     if (chatContainer.value) chatContainer.value.scrollTop = chatContainer.value.scrollHeight
   })
 }
+
 </script>
+
 
 
 <style>
