@@ -15,7 +15,7 @@ embedding = UpstageEmbeddings(
 )
 
 # 3. 이미 저장된 ChromaDB 경로
-persist_directory = "data/chroma_alloergies"  # 크로마DB가 저장된 폴더 경로로 수정
+persist_directory = "data/chroma_db"  # 크로마DB가 저장된 폴더 경로로 수정
 
 # 4. 저장된 크로마DB에서 벡터스토어 불러오기
 client_settings = Settings(anonymized_telemetry=False)

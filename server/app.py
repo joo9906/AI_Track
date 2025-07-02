@@ -4,8 +4,8 @@ from pydantic import BaseModel
 from typing import Optional
 from fastapi.middleware.cors import CORSMiddleware
 from chat import chat, session_contexts
-# from retriever import retriever
-from test.test_retriever import retriever  # 테스트용 retriever 임포트
+from retriever import retriever
+# from test.test_retriever import retriever  # 테스트용 retriever 임포트
 
 app = FastAPI()
 app.add_middleware(
