@@ -27,4 +27,5 @@ def multi_retrieve(query, k=5):
         retr = vs.as_retriever(search_type="mmr", search_kwargs={"k": k})
         docs = retr.invoke(query)
         all_results[topic] = docs
+        print(f"{topic} ({len(docs)}개): {[doc.metadata for doc in docs]}")
     return all_results
