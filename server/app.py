@@ -1,6 +1,7 @@
 # app.py
 from fastapi import FastAPI
 from pydantic import BaseModel
+from typing import Optional
 from fastapi.middleware.cors import CORSMiddleware
 from chat import chat, session_contexts
 from retriever import retriever
@@ -17,6 +18,8 @@ app.add_middleware(
 class MessageRequest(BaseModel):
     session_id: str
     message: str
+    patient: dict
+    history: Optional[list] = None
 
 @app.post("/chat")
 async def chat_endpoint(req: MessageRequest):
