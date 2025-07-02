@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 import os
 from langchain_chroma import Chroma
 from langchain_upstage import UpstageEmbeddings
+from chromadb.config import Settings
 
 load_dotenv()
 api_key = os.getenv("UPSTAGE_API_KEY")
