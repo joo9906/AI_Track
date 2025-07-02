@@ -1,55 +1,70 @@
+# chat.py
 from dotenv import load_dotenv
 import os
 from langchain_upstage import ChatUpstage
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_community.chat_message_histories import ChatMessageHistory
+from langchain_core.runnables.history import RunnableWithMessageHistory
 
+# 환경 변수 로드 및 LLM 세팅
 load_dotenv()
 api_key = os.getenv("UPSTAGE_API_KEY")
 llm = ChatUpstage(api_key=api_key)
 
-def chat(query, docs_dict, patient, history=None):
-    try:
-        # 시스템 프롬프트 작성
-        prompt_text = """
-당신은 의료 전문가의 약물 투약 의사결정을 돕는 AI입니다.
-다음은 실제 환자와 유사한 가상환자의 정보입니다. 이를 기반으로 적절한 약물을 제안하십시오.
-답변은 간결하고 의사결정에 도움이 될 만한 유의미한 정보만 제공해야 합니다.
-환자가 실제로 복용 중인 약물 정보는 '[실제 환자 정보]'의 '투약 약물' 항목에 명시됩니다.
-환자가 실제로 가진 알러지는 '[실제 환자 정보]'의 '알러지' 항목에 명시됩니다.
-해당 항목에 '없음'으로 표기된 경우, 환자가 현재 복용 중인 약물과 알러지은 없다고 간주해야 합니다.
-환자가 복용하지 않은 약물을 '복용 중'으로 간주하거나 언급하지 마십시오.
-환자가 가지지 않은 알러지를 '알러지 보유'로 간주하거나 언급하지 마십시오.
-답변은 무조건 한국어로 답변해주세요.
-답변은 항상 의료 전문가를 대상으로 하는 것이기에 전문가의 조언을 구하는 내용은 반드시 넣지 말아주세요.
-"""
+# 프롬프트 템플릿
+prompt = ChatPromptTemplate.from_messages(
+    [
+        (
+            "system",
+            """
+            당신은 의료 전문가를 지원하는 AI 어시스턴트입니다.
+            아래 제공된 환자 기록(문맥)과 지금까지의 대화 히스토리(history)를 참고하여, 신규 환자에게 주입해야 할 약물을 추천하세요.
 
-        # 실제 환자 정보
-        prompt_text += "\n[실제 환자 정보]\n"
-        for key, value in patient.items():
-            prompt_text += f"{key}: {value}\n"
+            - 최대한 문맥에 포함된 정보와 이전 환자 사례만을 근거로 약물을 추천하세요.
+            - 임의로 정보를 추측하거나, 문맥에 없는 약물을 추천하지 마세요.
+            - 약물명, 용량, 투여 경로 등은 명확하게 제시하세요.
+            - 부작용, 금기사항 등 주의할 점이 있다면 반드시 함께 안내하세요.
+            - 답변은 반드시 한국어로 작성하세요.
+            - 만약 추천이 어렵거나 문맥이 부족하다면 "추천이 어렵습니다"라고만 답변하세요.
+            ---
+            대화의 히스토리(history): 
+            {history}
+            ---
+            문맥(context): 
+            {context}
+            ---
+            아래의 질문에 답변하세요.
+            """,
+        ),
+        ("human", "{input}"),
+    ]
+)
+output_parser = StrOutputParser()
 
-        # 벡터 검색 정보
-        for topic, docs in docs_dict.items():
-            context = "\n".join([
-                d.page_content if hasattr(d, "page_content") else str(d)
-                for d in docs
-            ])
-            prompt_text += f"\n--- {topic.upper()} 정보 ---\n{context}\n"
+# 세션별 히스토리/컨텍스트 저장 (프로세스 메모리)
+session_histories = {}
+session_contexts = {}
 
-        # 사용자 질문 추가
-        prompt_text += f"\n사용자 질문: {query}\n"
+def get_message_history(session_id: str):
+    if session_id not in session_histories:
+        session_histories[session_id] = ChatMessageHistory()
+    return session_histories[session_id]
 
-        # LLM 직접 호출
-        result = llm.invoke(prompt_text)
-        
-        # content만 추출
-        if hasattr(result, 'content'):
-            answer = result.content
-        elif isinstance(result, dict) and 'content' in result:
-            answer = result['content']
-        else:
-            answer = str(result)
-
-        return {"answer": answer, "status": "success"}
-
-    except Exception as e:
-        return {"answer": "오류 발생", "status": "fail", "error": str(e)}
+def chat(session_id: str, query: str, context: str = None):
+    # context가 주어지면(최초 대화), 세션에 저장
+    if context is not None:
+        session_contexts[session_id] = context
+    # context가 없으면 기존 세션의 context 사용
+    context = session_contexts.get(session_id, "")
+    chain = RunnableWithMessageHistory(
+        prompt | llm | output_parser,
+        get_message_history,
+        input_messages_key="input",
+        history_messages_key="history"
+    )
+    response = chain.invoke(
+        {"context": context, "input": query},
+        config={"configurable": {"session_id": session_id}}
+    )
+    return response

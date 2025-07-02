@@ -1,30 +1,34 @@
+# app.py
 from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import Optional
 from fastapi.middleware.cors import CORSMiddleware
-from chat import chat
-from retriever import multi_retrieve
+from chat import chat, session_contexts
+# from retriever import retriever
+from test.test_retriever import retriever  # 테스트용 retriever 임포트
 
 app = FastAPI()
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],  # 개발용
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 class MessageRequest(BaseModel):
+    session_id: str
     message: str
-    patient: dict
-    history: Optional[list] = None
 
 @app.post("/chat")
-async def chat_endpoint(query: MessageRequest):
-    docs_dict = multi_retrieve(query.message)
-    return {"reply": chat(query.message, docs_dict=docs_dict, patient=query.patient, history=query.history)}
-
+async def chat_endpoint(req: MessageRequest):
+    # 최초 대화라면 retriever로 context 추출
+    if req.session_id not in session_contexts:
+        context = retriever(req.message)
+        reply = chat(req.session_id, req.message, context)
+    else:
+        reply = chat(req.session_id, req.message)
+    return {"reply": reply}
 
 if __name__ == "__main__":
     import uvicorn

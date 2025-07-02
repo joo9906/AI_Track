@@ -8,8 +8,8 @@
 -  retrieval.py : 단일 db 참조에서 다중 db 참조로 변경
 -  chat.py : 프롬프트 수정
 - 11:00 : 전체 코드 수정
--  app.py : 실제 환자 정보와 history 활용
--  Front/App.vue : 서버로 실제 환자 정보 날림 + 히스토리 및 환자 정보 pinia 저장
+-   app.py : 실제 환자 정보와 history 활용
+-   front/App.vue : 서버로 실제 환자 정보 날림 + 히스토리 및 환자 정보 pinia 저장
 
 ## 파일 구성
 ### colab
