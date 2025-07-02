@@ -56,6 +56,7 @@
         <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded font-semibold hover:bg-blue-700 transition">입력 완료</button>
       </form>
     </div>
+
     <div v-else class="w-full max-w-2xl bg-white rounded-lg shadow-lg p-6 flex flex-col h-[70vh]">
       <div class="mb-4 p-4 rounded-lg bg-blue-50 border border-blue-200 text-blue-900 text-sm shadow-sm">
         <div class="font-bold text-base mb-1">환자 요약 정보</div>
@@ -88,6 +89,7 @@
 
 <script setup>
 import { ref, nextTick } from 'vue'
+import { content } from '../tailwind.config'
 
 const patient = ref({
   age: '', // 나이
@@ -129,6 +131,10 @@ function submitPatientInfo() {
   });
 }
 
+
+
+
+
 function sendMessage() {
   if (!input.value.trim()) return
   messages.value.push({ role: 'user', content: input.value })
@@ -151,3 +157,36 @@ body {
   font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
 }
 </style>
+
+
+<!-- 수정 전 sendMessage(프롬프트 충돌 가능성 있음) -->
+<!-- async function sendMessage() {
+  if (!input.value.trim()) return
+
+  const userMessage = input.value
+  messages.value.push({role:'user', content: userMessage})
+
+  const prompt = makeLLMPrompt(patient.value) + `\n\n사용자 질문 : ${userMessage}`
+
+  try {
+  const res = await fetch('http://localhost:8000/chat', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      patient : patient.value,
+      message: input.value,
+      history: messages.value
+    })
+  })
+
+  const data = await res.json()
+  const reply = data.reply.answer || data.reply || 'AI 응답이 없습니다.'
+  messages.value.push({role: 'assistant', content: reply})
+} catch (e) {
+  messages.value.push({role: 'assistant', content: '오류 발생. 오류 내용: ' + e.message})
+}
+  input.value = ''
+  await nextTick(() => {
+    if (chatContainer.value) chatContainer.value.scrollTop = chatContainer.value.scrollHeight
+  })
+} -->
