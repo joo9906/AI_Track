@@ -2,6 +2,7 @@ from dotenv import load_dotenv
 import os
 from langchain_chroma import Chroma
 from langchain_upstage import UpstageEmbeddings
+from chromadb.config import Settings
 
 # 1. .env 파일에서 환경변수 불러오기
 load_dotenv()
@@ -14,12 +15,14 @@ embedding = UpstageEmbeddings(
 )
 
 # 3. 이미 저장된 ChromaDB 경로
-persist_directory = "./chroma_db"  # 크로마DB가 저장된 폴더 경로로 수정
+persist_directory = "data/chroma_alloergies"  # 크로마DB가 저장된 폴더 경로로 수정
 
 # 4. 저장된 크로마DB에서 벡터스토어 불러오기
+client_settings = Settings(anonymized_telemetry=False)
 vectorstore = Chroma(
     persist_directory=persist_directory,
-    embedding_function=embedding
+    embedding_function=embedding,
+    client_settings=client_settings
 )
 
 def retriever(query, k=5):
@@ -30,10 +33,13 @@ def retriever(query, k=5):
     result_docs = retriever.invoke(query)
     return result_docs
 
+def retriever_with_score(query, k=5):
+    results = vectorstore.similarity_search_with_score(query, k=k)
+    return results
 
 if __name__ == "__main__":
     query = input("검색할 쿼리를 입력하세요: ")
-    results = retriever(query)
+    results = retriever_with_score(query)
     print("\n[검색 결과]")
     for i, doc in enumerate(results, 1):
         print(f"\n--- 문서 {i} ---")
