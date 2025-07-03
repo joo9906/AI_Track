@@ -1,6 +1,5 @@
 from langchain_chroma import Chroma
 from langchain_upstage import UpstageEmbeddings
-from langchain.docstore.document import Document
 from chromadb.config import Settings
 from dotenv import load_dotenv
 import os

@@ -2,7 +2,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
-from chat import chat, session_contexts
+from chat import chat
 from retriever import retriever
 # from test.test_retriever import retriever  # 테스트용 retriever 임포트
 
