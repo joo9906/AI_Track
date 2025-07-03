@@ -30,4 +30,10 @@ async def chat_endpoint(req: MessageRequest):
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(
+        "app:app",
+        host="0.0.0.0",
+        port=8443,
+        ssl_certfile="./selfsigned.crt",
+        ssl_keyfile="./selfsigned.key"
+    )

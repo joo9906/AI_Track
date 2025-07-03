@@ -198,3 +198,6 @@ pyrightconfig.json
 # End of https://www.toptal.com/developers/gitignore/api/python,visualstudiocode
 server/test/
 server/data/
+server/selfsigned.crt
+server/selfsigned.key
+server/eval2.py
