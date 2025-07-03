@@ -2,7 +2,7 @@
   <div class="flex flex-col flex-1 h-full">
     <div class="flex-1 overflow-y-auto p-4 border border-gray-200 mb-4 bg-gray-50 rounded-lg min-h-0">
       <div v-for="(msg, i) in messages" :key="i" class="mb-6">
-        <div :class="msg.role === 'user' ? 'text-right' : 'text-left'">
+        <div v-if="msg.role !== 'system'" :class="msg.role === 'user' ? 'text-right' : 'text-left'">
           <div :class="msg.role === 'user' ? 'inline-block bg-blue-100 text-blue-900 px-4 py-2 rounded-lg max-w-xs lg:max-w-md' : 'inline-block bg-gray-200 text-gray-800 px-4 py-2 rounded-lg max-w-xs lg:max-w-md'">
             <div class="font-semibold text-xs mb-1">{{ msg.role === 'user' ? '사용자' : 'AI' }}</div>
             <div v-if="msg.role === 'user'" class="whitespace-pre-wrap">{{ msg.content }}</div>

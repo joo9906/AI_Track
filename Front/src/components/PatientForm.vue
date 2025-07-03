@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full overflow-y-auto p-4 ">
+  <div class="h-full overflow-y-auto p-4">
     <form @submit.prevent="submit" class="space-y-4 bg-white p-6 rounded-lg shadow-lg max-w-md mx-auto">
     <h2 class="text-2xl font-bold mb-6 text-center text-blue-700">환자 정보 입력</h2>
     
