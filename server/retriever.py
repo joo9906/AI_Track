@@ -25,7 +25,7 @@ vectorstore = Chroma(
     client_settings=client_settings
 )
 
-def retriever(query, k=5):
+def retriever(query, k=3):
     retriever = vectorstore.as_retriever(
         search_type='mmr',
         search_kwargs={"k": k}
@@ -44,9 +44,4 @@ if __name__ == "__main__":
     for i, doc in enumerate(results, 1):
         print(f"\n--- 문서 {i} ---")
         # doc이 dict 또는 Document 객체일 수 있으니, 적절히 출력
-        if hasattr(doc, 'page_content'):
-            print(doc.page_content)
-        elif isinstance(doc, dict) and 'page_content' in doc:
-            print(doc['page_content'])
-        else:
-            print(doc)
+        print(doc[0].page_content)

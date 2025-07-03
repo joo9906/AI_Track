@@ -1,9 +1,8 @@
 # app.py
 from fastapi import FastAPI
 from pydantic import BaseModel
-from typing import Optional
 from fastapi.middleware.cors import CORSMiddleware
-from chat import chat, session_contexts
+from chat import chat
 from retriever import retriever
 # from test.test_retriever import retriever  # 테스트용 retriever 임포트
 
@@ -23,11 +22,10 @@ class MessageRequest(BaseModel):
 @app.post("/chat")
 async def chat_endpoint(req: MessageRequest):
     # 최초 대화라면 retriever로 context 추출
-    if req.session_id not in session_contexts:
-        context = retriever(req.message)
-        reply = chat(req.session_id, req.message, context)
-    else:
-        reply = chat(req.session_id, req.message)
+    print(f"\n-------------\nReceived message: {req.message}\n for session: {req.session_id}\n ---------------")
+    
+    context = retriever(req.message)
+    reply = chat(req.session_id, req.message, context)
     return {"reply": reply}
 
 if __name__ == "__main__":
