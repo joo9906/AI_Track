@@ -1,4 +1,8 @@
 version: 1
+backend:
+  phases:
+    build:
+      commands: []
 frontend:
   phases:
     preBuild:
@@ -11,4 +15,11 @@ frontend:
   artifacts:
     baseDirectory: Front/dist
     files:
-      - '**/*' 
+      - '**/*'
+  cache:
+    paths:
+      - Front/node_modules/**/*
+  
+build:
+  environment:
+    NODE_VERSION: 20
