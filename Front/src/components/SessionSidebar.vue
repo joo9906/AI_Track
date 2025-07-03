@@ -1,6 +1,6 @@
 <template>
   <div class="w-64 bg-white border-r border-gray-200 p-4 overflow-y-auto">
-    <h2 class="text-lg font-bold mb-4 text-gray-800">대화 세션</h2>
+    <h2 class="text-lg font-bold mb-4 text-gray-800">대화 기록(최근 10개)</h2>
     <div v-for="session in sessions" :key="session.id" class="mb-3">
       <button
         class="w-full text-left p-3 border border-gray-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition-colors"
@@ -15,7 +15,7 @@
         </div>
       </button>
       <div class="ml-2 mt-2 text-sm text-gray-600 space-y-1" v-if="session.messages.length">
-        <div v-for="(msg, i) in session.messages.slice(-2)" :key="i" class="truncate">
+        <div v-for="(msg, i) in session.messages.slice(-10)" :key="i" class="truncate">
           <span class="font-medium">{{ msg.role === 'user' ? '사용자' : 'AI' }}:</span> 
           <span class="text-gray-500">{{ msg.content.substring(0, 30) }}{{ msg.content.length > 30 ? '...' : '' }}</span>
         </div>

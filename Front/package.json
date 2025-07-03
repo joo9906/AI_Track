@@ -11,7 +11,9 @@
     "build:css": "tailwindcss -i ./src/assets/base.css -o ./src/assets/main.css --watch"
   },
   "dependencies": {
+    "@heroicons/vue": "^2.2.0",
     "axios": "^1.10.0",
+    "marked": "^16.0.0",
     "pinia": "^3.0.3",
     "uuid": "^11.1.0",
     "vue": "^3.5.17",

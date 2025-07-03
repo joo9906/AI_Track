@@ -1,27 +1,44 @@
 <template>
-  <div class="flex h-screen">
-    <div v-if="showSidebar && selectedSession">
-      <SessionSidebar :sessions="sessions" @select="handleSelectSession" />
-    </div>
-    <div class="flex-1 flex flex-col">
-      <div v-if="selectedSession" class="flex items-center justify-between p-4">
-        <button
-          class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-blue-100 transition font-semibold"
-          @click="showSidebar = !showSidebar"
-        >
-          {{ showSidebar ? '대화 세션 닫기' : '대화 세션 보기' }}
-        </button>
+  <div class="flex flex-col h-screen">
+    <!-- 네비게이션 바 -->
+<div class="w-full flex justify-center pt-4 pb-2 sticky top-0 z-20">
+  <nav class="max-w-xl w-full bg-gradient-to-r from-blue-500 via-blue-600 to-blue-700 text-white shadow-lg rounded-2xl flex items-center justify-between px-6 py-3">
+    <div class="flex items-center gap-3">
+      <div class="bg-white bg-opacity-10 rounded-full p-2 shadow">
+        <IdentificationIcon class="w-7 h-7 text-white drop-shadow" />
       </div>
-      <div class="flex-1 flex flex-col p-4">
-        <div v-if="!selectedSession" class="flex flex-1 items-center justify-center">
-          <PatientForm @submit="handleNewSession" />
+      <span class="text-2xl font-extrabold drop-shadow-sm text-white">약물 투약 제안 챗봇</span>
+    </div>
+    <div class="hidden md:flex items-center gap-6 pr-2">
+      <span class="text-sm text-blue-100 font-semibold tracking-wide">Powered by AI</span>
+    </div>
+  </nav>
+</div>
+
+    <div class="flex flex-1 overflow-hidden">
+      <div v-if="showSidebar && selectedSession">
+        <SessionSidebar :sessions="sessions" @select="handleSelectSession" />
+      </div>
+      <div class="flex-1 flex flex-col overflow-hidden">
+        <div v-if="selectedSession" class="flex items-center justify-between p-4 flex-shrink-0">
+          <button
+            class="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-blue-100 transition font-semibold"
+            @click="showSidebar = !showSidebar"
+          >
+            {{ showSidebar ? '대화 세션 닫기' : '대화 세션 보기' }}
+          </button>
         </div>
-        <div v-else class="flex gap-16">
-          <PatientInfo :patient="selectedSession.patient" :session-id="selectedSession.id" />
-          <Chat
-            :messages="selectedSession.messages"
-            @send="handleSendMessage"
-          />
+        <div class="flex-1 flex flex-col p-4 overflow-hidden">
+          <div v-if="!selectedSession" class="flex-1 overflow-hidden">
+            <PatientForm @submit="handleNewSession" />
+          </div>
+          <div v-else class="flex gap-16 h-full overflow-hidden">
+            <PatientInfo :patient="selectedSession.patient" :session-id="selectedSession.id" />
+            <Chat
+              :messages="selectedSession.messages.filter(msg => msg.role !== 'system')"
+              @send="handleSendMessage"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -35,6 +52,7 @@ import SessionSidebar from './components/SessionSidebar.vue'
 import PatientForm from './components/PatientForm.vue'
 import PatientInfo from './components/PatientInfo.vue'
 import Chat from './components/Chat.vue'
+import { IdentificationIcon } from '@heroicons/vue/24/outline'
 
 const sessions = ref([])
 const selectedSession = ref(null)
@@ -50,6 +68,7 @@ function makeLLMPrompt(patient) {
 5. 바이탈/검사 수치: 최고혈압 ${patient.sbp ?? ''}, 최저혈압 ${patient.dbp ?? ''}
 6. 수술/시술 이력: ${patient.procedures || '없음'}
 전문 의료진들이 사용하는 언어로 답변해주세요.
+대답은 보기 쉽게 정리하여 마크다운 형식으로 주세요.
 `.trim();
 }
 

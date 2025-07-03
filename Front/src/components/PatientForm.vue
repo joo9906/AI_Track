@@ -1,5 +1,6 @@
 <template>
-  <form @submit.prevent="submit" class="space-y-4 bg-white p-6 rounded-lg shadow-lg max-w-md mx-auto">
+  <div class="h-full overflow-y-auto p-4 ">
+    <form @submit.prevent="submit" class="space-y-4 bg-white p-6 rounded-lg shadow-lg max-w-md mx-auto">
     <h2 class="text-2xl font-bold mb-6 text-center text-blue-700">환자 정보 입력</h2>
     
     <div>
@@ -60,7 +61,8 @@
     </div>
     
     <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded font-semibold hover:bg-blue-700 transition">등록</button>
-  </form>
+    </form>
+  </div>
 </template>
 
 <script setup>
