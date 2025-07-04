@@ -28,7 +28,6 @@
 ## 🌐 배포된 링크
 
 - **웹 데모 링크**: [바로가기](https://main.d2pi120e4ybq0g.amplifyapp.com)
-- **API 문서**: [API Docs](https://your-api-doc-link.com)
 
 ---
 
