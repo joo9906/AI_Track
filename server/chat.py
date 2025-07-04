@@ -63,10 +63,8 @@ def get_message_history(session_id: str):
     return session_histories[session_id]
 
 def chat(session_id: str, query: str, context: str = None):
-    # context가 주어지면(최초 대화), 세션에 저장
     if context is not None:
         session_contexts[session_id] = context
-    # context가 없으면 기존 세션의 context 사용
     context = session_contexts.get(session_id, "")
     print(f"Session ID: {session_id}\n Query: {query}\n Context: {context[0].page_content}")
     chain = RunnableWithMessageHistory(

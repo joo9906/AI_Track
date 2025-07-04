@@ -15,7 +15,7 @@ embedding = UpstageEmbeddings(
 )
 
 # 3. 이미 저장된 ChromaDB 경로
-persist_directory = os.getenv("DB_PATH") # 크로마DB가 저장된 폴더 경로로 수정
+persist_directory = os.getenv("DB_PATH")
 
 # 4. 저장된 크로마DB에서 벡터스토어 불러오기
 client_settings = Settings(anonymized_telemetry=False)
@@ -43,5 +43,4 @@ if __name__ == "__main__":
     print("\n[검색 결과]")
     for i, doc in enumerate(results, 1):
         print(f"\n--- 문서 {i} ---")
-        # doc이 dict 또는 Document 객체일 수 있으니, 적절히 출력
         print(doc[0].page_content)
