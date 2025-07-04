@@ -15,7 +15,7 @@ embedding = UpstageEmbeddings(
 )
 
 # 3. 이미 저장된 ChromaDB 경로
-persist_directory = "data/chroma_db_v2"  # 크로마DB가 저장된 폴더 경로로 수정
+persist_directory = os.getenv("DB_PATH") # 크로마DB가 저장된 폴더 경로로 수정
 
 # 4. 저장된 크로마DB에서 벡터스토어 불러오기
 client_settings = Settings(anonymized_telemetry=False)
@@ -25,7 +25,7 @@ vectorstore = Chroma(
     client_settings=client_settings
 )
 
-def retriever(query, k=3):
+def retriever(query, k=5):
     retriever = vectorstore.as_retriever(
         search_type='mmr',
         search_kwargs={"k": k}
@@ -33,7 +33,7 @@ def retriever(query, k=3):
     result_docs = retriever.invoke(query)
     return result_docs
 
-def retriever_with_score(query, k=3):
+def retriever_with_score(query, k=5):
     results = vectorstore.similarity_search_with_score(query, k=k)
     return results
 
